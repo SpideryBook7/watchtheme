@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nearby_connections/nearby_connections.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:watchtheme/screens/AndroidScreens/apply_theme_screen.dart';
 
 class ConnectionScreen extends StatefulWidget {
   const ConnectionScreen({super.key});
@@ -52,9 +53,9 @@ class _ConnectionScreenState extends State<ConnectionScreen> {
       );
     } catch (e) {
       setState(() => _isDiscovering = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error al iniciar discovery: $e")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Error al iniciar discovery: $e")));
     }
   }
 
@@ -75,20 +76,24 @@ class _ConnectionScreenState extends State<ConnectionScreen> {
       },
       onConnectionResult: (id, status) {
         if (status == Status.CONNECTED) {
+          ThemeApplier.connectedWatchEndpoint = id; // << IMPORTANTE
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Conectado a: ${_endpoints[id]?.endpointName ?? ''}")),
+            SnackBar(
+              content: Text(
+                "Conectado a: ${_endpoints[id]?.endpointName ?? ''}",
+              ),
+            ),
           );
-          // Por ejemplo, navega a otra pantalla o mantén la conexión abierta
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Error de conexión: $status")),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text("Error de conexión: $status")));
         }
       },
       onDisconnected: (id) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Desconectado.")),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text("Desconectado.")));
       },
     );
   }
@@ -102,29 +107,30 @@ class _ConnectionScreenState extends State<ConnectionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Conectar al Reloj"),
-      ),
-      body: _isDiscovering
-          ? _endpoints.isEmpty
-              ? const Center(child: CircularProgressIndicator())
-              : ListView.builder(
-                  itemCount: _endpoints.length,
-                  itemBuilder: (context, index) {
-                    String id = _endpoints.keys.elementAt(index);
-                    EndpointInfo info = _endpoints[id]!;
-                    return ListTile(
-                      leading: const Icon(Icons.watch),
-                      title: Text(info.endpointName),
-                      subtitle: Text("ID: $id"),
-                      trailing: ElevatedButton(
-                        onPressed: () => connectTo(id),
-                        child: const Text("Conectar"),
-                      ),
-                    );
-                  },
-                )
-          : const Center(child: Text("Esperando para descubrir dispositivos...")),
+      appBar: AppBar(title: const Text("Conectar al Reloj")),
+      body:
+          _isDiscovering
+              ? _endpoints.isEmpty
+                  ? const Center(child: CircularProgressIndicator())
+                  : ListView.builder(
+                    itemCount: _endpoints.length,
+                    itemBuilder: (context, index) {
+                      String id = _endpoints.keys.elementAt(index);
+                      EndpointInfo info = _endpoints[id]!;
+                      return ListTile(
+                        leading: const Icon(Icons.watch),
+                        title: Text(info.endpointName),
+                        subtitle: Text("ID: $id"),
+                        trailing: ElevatedButton(
+                          onPressed: () => connectTo(id),
+                          child: const Text("Conectar"),
+                        ),
+                      );
+                    },
+                  )
+              : const Center(
+                child: Text("Esperando para descubrir dispositivos..."),
+              ),
     );
   }
 }
