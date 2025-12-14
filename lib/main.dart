@@ -9,11 +9,12 @@ import 'utils/device.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Supabase.initialize(
-    url: 'https://ewtzyzsoktdpphzjmteu.supabase.co',
-    anonKey:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3dHp5enNva3RkcHBoemptdGV1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgzMDgwNjIsImV4cCI6MjA2Mzg4NDA2Mn0.dEbOUynruOWk6W_CL7wCZmqCwn4cYFNHM1-vWgj0BBE',
-  );
+  // Supabase initialization paused for demo mode
+  // await Supabase.initialize(
+  //   url: 'https://ewtzyzsoktdpphzjmteu.supabase.co',
+  //   anonKey:
+  //       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3dHp5enNva3RkcHBoemptdGV1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgzMDgwNjIsImV4cCI6MjA2Mzg4NDA2Mn0.dEbOUynruOWk6W_CL7wCZmqCwn4cYFNHM1-vWgj0BBE',
+  // );
 
   final deviceType = await getDeviceType();
 
@@ -46,7 +47,10 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
         colorSchemeSeed: Colors.deepPurple,
-        brightness: deviceType == 'tv' || deviceType == 'wear' ? Brightness.dark : Brightness.light,
+        brightness:
+            deviceType == 'tv' || deviceType == 'wear'
+                ? Brightness.dark
+                : Brightness.light,
       ),
       home: homeWidget,
     );

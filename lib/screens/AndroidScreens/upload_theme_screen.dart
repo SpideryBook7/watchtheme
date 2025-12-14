@@ -11,7 +11,7 @@ class UploadThemeScreen extends StatefulWidget {
 }
 
 class _UploadThemeScreenState extends State<UploadThemeScreen> {
-  final SupabaseClient supabase = Supabase.instance.client;
+  // final SupabaseClient supabase = Supabase.instance.client; // Disabled for demo
   final TextEditingController nameController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
 
@@ -20,7 +20,9 @@ class _UploadThemeScreenState extends State<UploadThemeScreen> {
   List<File> extraImages = [];
 
   Future<void> pickImage() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.image);
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.image,
+    );
     if (result != null && result.files.single.path != null) {
       setState(() {
         imageFile = File(result.files.single.path!);
@@ -30,7 +32,7 @@ class _UploadThemeScreenState extends State<UploadThemeScreen> {
 
   Future<void> pickThemeFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.custom, 
+      type: FileType.custom,
       allowedExtensions: ['zip', 'json', 'wfs', 'hwt'],
     );
     if (result != null && result.files.single.path != null) {
@@ -47,7 +49,8 @@ class _UploadThemeScreenState extends State<UploadThemeScreen> {
     );
     if (result != null) {
       setState(() {
-        extraImages = result.paths.whereType<String>().map((p) => File(p)).toList();
+        extraImages =
+            result.paths.whereType<String>().map((p) => File(p)).toList();
       });
     }
   }
@@ -56,46 +59,33 @@ class _UploadThemeScreenState extends State<UploadThemeScreen> {
     final String name = nameController.text.trim();
     final String description = descriptionController.text.trim();
 
-    if (name.isEmpty || description.isEmpty || imageFile == null || themeFile == null) {
+    if (name.isEmpty ||
+        description.isEmpty ||
+        imageFile == null ||
+        themeFile == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Completa todos los campos y selecciona los archivos')),
+        const SnackBar(
+          content: Text('Completa todos los campos y selecciona los archivos'),
+        ),
       );
       return;
     }
 
     try {
+      // Simulate network request
+      await Future.delayed(const Duration(seconds: 2));
+
+      /* 
+      // SUPABASE UPLOAD LOGIC DISABLED
       final timestamp = DateTime.now().millisecondsSinceEpoch;
-
-      // Subir imagen principal
-      final imagePath = 'themes/images/${timestamp}_${imageFile!.path.split('/').last}';
-      await supabase.storage.from('themes-files').upload(imagePath, imageFile!);
-      final imageUrl = supabase.storage.from('themes-files').getPublicUrl(imagePath);
-
-      // Subir archivo del tema
-      final themePath = 'themes/files/${timestamp}_${themeFile!.path.split('/').last}';
-      await supabase.storage.from('themes-files').upload(themePath, themeFile!);
-      final themeUrl = supabase.storage.from('themes-files').getPublicUrl(themePath);
-
-      // Subir imágenes extra (galería)
-      List<String> galleryUrls = [];
-      for (var file in extraImages) {
-        final path = 'themes/gallery/${timestamp}_${file.path.split('/').last}';
-        await supabase.storage.from('themes-files').upload(path, file);
-        final url = supabase.storage.from('themes-files').getPublicUrl(path);
-        galleryUrls.add(url);
-      }
-
-      // Insertar en Supabase
-      await supabase.from('themes-files').insert({
-        'name': name,
-        'description': description,
-        'image_url': imageUrl,
-        'theme_file_url': themeUrl,
-        'gallery_urls': galleryUrls,
-      });
+      // ... storage uploads ...
+      // ... db insert ...
+      */
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Tema subido correctamente')),
+        const SnackBar(
+          content: Text('Demo Mode: Upload Simulated Successfully! 🚀'),
+        ),
       );
 
       nameController.clear();
@@ -106,9 +96,9 @@ class _UploadThemeScreenState extends State<UploadThemeScreen> {
         extraImages = [];
       });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
     }
   }
 
@@ -133,7 +123,10 @@ class _UploadThemeScreenState extends State<UploadThemeScreen> {
 
             _buildUploadButton(
               icon: Icons.image,
-              label: imageFile == null ? 'Seleccionar Imagen Principal' : 'Imagen seleccionada',
+              label:
+                  imageFile == null
+                      ? 'Seleccionar Imagen Principal'
+                      : 'Imagen seleccionada',
               onTap: pickImage,
               filled: imageFile != null,
             ),
@@ -141,9 +134,10 @@ class _UploadThemeScreenState extends State<UploadThemeScreen> {
 
             _buildUploadButton(
               icon: Icons.collections,
-              label: extraImages.isEmpty
-                  ? 'Seleccionar Imágenes Extras'
-                  : '${extraImages.length} imagen(es) seleccionada(s)',
+              label:
+                  extraImages.isEmpty
+                      ? 'Seleccionar Imágenes Extras'
+                      : '${extraImages.length} imagen(es) seleccionada(s)',
               onTap: pickExtraImages,
               filled: extraImages.isNotEmpty,
             ),
@@ -151,7 +145,10 @@ class _UploadThemeScreenState extends State<UploadThemeScreen> {
 
             _buildUploadButton(
               icon: Icons.file_present,
-              label: themeFile == null ? 'Seleccionar Archivo del Tema' : 'Archivo seleccionado',
+              label:
+                  themeFile == null
+                      ? 'Seleccionar Archivo del Tema'
+                      : 'Archivo seleccionado',
               onTap: pickThemeFile,
               filled: themeFile != null,
             ),
@@ -163,8 +160,13 @@ class _UploadThemeScreenState extends State<UploadThemeScreen> {
               label: const Text('Subir Tema'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color.fromARGB(255, 221, 201, 255),
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 14,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
                 textStyle: const TextStyle(fontSize: 16),
               ),
             ),
@@ -203,12 +205,18 @@ class _UploadThemeScreenState extends State<UploadThemeScreen> {
         icon: Icon(icon, color: filled ? Colors.deepPurple : Colors.grey),
         label: Text(
           label,
-          style: TextStyle(color: filled ? Colors.deepPurple : Colors.grey[600]),
+          style: TextStyle(
+            color: filled ? Colors.deepPurple : Colors.grey[600],
+          ),
         ),
         style: OutlinedButton.styleFrom(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          side: BorderSide(color: filled ? Colors.deepPurple : Colors.grey[400]!),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          side: BorderSide(
+            color: filled ? Colors.deepPurple : Colors.grey[400]!,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
         ),
       ),
     );
