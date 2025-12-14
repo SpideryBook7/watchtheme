@@ -119,8 +119,6 @@ class _WearConnectionScreenState extends State<WearConnectionScreen> {
   }
 
   Future<void> _applyTheme(File file) async {
-    // Aquí la lógica real para aplicar el tema en el reloj.
-    // Por ahora solo un print, pero aquí debes integrar el mecanismo necesario.
     print("Aplicando tema desde: ${file.path}");
   }
 

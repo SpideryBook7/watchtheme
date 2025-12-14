@@ -30,8 +30,8 @@ class _UploadThemeScreenState extends State<UploadThemeScreen> {
 
   Future<void> pickThemeFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['zip', 'json', 'txt', 'hwt'],
+      type: FileType.custom, 
+      allowedExtensions: ['zip', 'json', 'wfs', 'hwt'],
     );
     if (result != null && result.files.single.path != null) {
       setState(() {

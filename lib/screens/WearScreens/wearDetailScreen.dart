@@ -86,7 +86,6 @@ class WearDetailScreen extends StatelessWidget {
                   children: [
                     ElevatedButton.icon(
                       onPressed: () {
-                        // TODO: lógica de aplicar tema
                       },
                       icon: const Icon(Icons.watch, size: 12),
                       label: const Text("Aplicar", style: TextStyle(fontSize: 12)),
@@ -103,7 +102,6 @@ class WearDetailScreen extends StatelessWidget {
                     const SizedBox(width: 3),
                     OutlinedButton(
                       onPressed: () => Navigator.pop(context),
-                      child: const Text("Volver", style: TextStyle(fontSize: 12)),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 8),
                         foregroundColor: Colors.deepPurple,
@@ -114,6 +112,7 @@ class WearDetailScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
+                      child: const Text("Volver", style: TextStyle(fontSize: 12)),
                     ),
                   ],
                 ),

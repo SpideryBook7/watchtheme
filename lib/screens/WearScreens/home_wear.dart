@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:watchtheme/screens/WearScreens/wearDetailScreen.dart';
 
-// Importa la pantalla de conexión (ajusta la ruta si es necesario)
 import 'package:watchtheme/screens/WearScreens/wear_connection.dart';
 
 class HomeWearScreen extends StatefulWidget {
