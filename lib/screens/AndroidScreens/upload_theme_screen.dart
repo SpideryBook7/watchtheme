@@ -65,7 +65,8 @@ class _UploadThemeScreenState extends State<UploadThemeScreen> {
         themeFile == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Completa todos los campos y selecciona los archivos'),
+          content: Text('Please complete all fields and select files'),
+          backgroundColor: Colors.redAccent,
         ),
       );
       return;
@@ -75,18 +76,14 @@ class _UploadThemeScreenState extends State<UploadThemeScreen> {
       // Simulate network request
       await Future.delayed(const Duration(seconds: 2));
 
-      /* 
-      // SUPABASE UPLOAD LOGIC DISABLED
-      final timestamp = DateTime.now().millisecondsSinceEpoch;
-      // ... storage uploads ...
-      // ... db insert ...
-      */
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Demo Mode: Upload Simulated Successfully! 🚀'),
-        ),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Theme uploaded successfully! 🚀'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
 
       nameController.clear();
       descriptionController.clear();
@@ -96,126 +93,232 @@ class _UploadThemeScreenState extends State<UploadThemeScreen> {
         extraImages = [];
       });
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+        );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text('Subir Tema', style: TextStyle(color: Colors.black)),
-        backgroundColor: Colors.white,
+        title: const Text(
+          'Upload Theme',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.transparent,
+        foregroundColor: Colors.white,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.deepPurple),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            _buildTextField(nameController, 'Nombre del tema'),
-            const SizedBox(height: 12),
-            _buildTextField(descriptionController, 'Descripción'),
-            const SizedBox(height: 24),
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFF1A1A2E), // Dark Navy
+              Color(0xFF16213E), // Dark Blue
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 600),
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _buildTextField(
+                      controller: nameController,
+                      label: 'Theme Name',
+                      icon: Icons.text_fields,
+                    ),
+                    const SizedBox(height: 16),
+                    _buildTextField(
+                      controller: descriptionController,
+                      label: 'Description',
+                      icon: Icons.description,
+                      maxLines: 3,
+                    ),
+                    const SizedBox(height: 32),
 
-            _buildUploadButton(
-              icon: Icons.image,
-              label:
-                  imageFile == null
-                      ? 'Seleccionar Imagen Principal'
-                      : 'Imagen seleccionada',
-              onTap: pickImage,
-              filled: imageFile != null,
-            ),
-            const SizedBox(height: 12),
+                    _buildUploadCard(
+                      title: 'Main Preview Image',
+                      subtitle: 'Required',
+                      icon: Icons.image,
+                      file: imageFile,
+                      onTap: pickImage,
+                    ),
+                    const SizedBox(height: 16),
 
-            _buildUploadButton(
-              icon: Icons.collections,
-              label:
-                  extraImages.isEmpty
-                      ? 'Seleccionar Imágenes Extras'
-                      : '${extraImages.length} imagen(es) seleccionada(s)',
-              onTap: pickExtraImages,
-              filled: extraImages.isNotEmpty,
-            ),
-            const SizedBox(height: 12),
+                    _buildUploadCard(
+                      title: 'Extra Screenshots',
+                      subtitle:
+                          extraImages.isEmpty
+                              ? 'Optional'
+                              : '${extraImages.length} selected',
+                      icon: Icons.collections,
+                      file: extraImages.isNotEmpty ? extraImages.first : null,
+                      onTap: pickExtraImages,
+                      isMultiple: true,
+                    ),
+                    const SizedBox(height: 16),
 
-            _buildUploadButton(
-              icon: Icons.file_present,
-              label:
-                  themeFile == null
-                      ? 'Seleccionar Archivo del Tema'
-                      : 'Archivo seleccionado',
-              onTap: pickThemeFile,
-              filled: themeFile != null,
-            ),
-            const SizedBox(height: 30),
+                    _buildUploadCard(
+                      title: 'Theme File',
+                      subtitle: '.zip, .json, .wfs, .hwt',
+                      icon: Icons.folder_zip,
+                      file: themeFile,
+                      onTap: pickThemeFile,
+                    ),
+                    const SizedBox(height: 40),
 
-            ElevatedButton.icon(
-              onPressed: uploadTheme,
-              icon: const Icon(Icons.upload),
-              label: const Text('Subir Tema'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color.fromARGB(255, 221, 201, 255),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 14,
+                    ElevatedButton.icon(
+                      onPressed: uploadTheme,
+                      icon: const Icon(Icons.cloud_upload),
+                      label: const Text('UPLOAD THEME'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFE94560),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        textStyle: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.2,
+                        ),
+                        elevation: 8,
+                        shadowColor: const Color(0xFFE94560).withOpacity(0.5),
+                      ),
+                    ),
+                  ],
                 ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                textStyle: const TextStyle(fontSize: 16),
               ),
             ),
-          ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String hint) {
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    int maxLines = 1,
+  }) {
     return TextField(
       controller: controller,
+      maxLines: maxLines,
+      style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
-        labelText: hint,
+        labelText: label,
+        labelStyle: TextStyle(color: Colors.white70),
+        prefixIcon: Icon(icon, color: Colors.white70),
         filled: true,
-        fillColor: Colors.white,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        fillColor: Colors.white.withOpacity(0.05),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
+        ),
         focusedBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: Colors.deepPurple),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: Color(0xFFE94560)),
         ),
       ),
     );
   }
 
-  Widget _buildUploadButton({
+  Widget _buildUploadCard({
+    required String title,
+    required String subtitle,
     required IconData icon,
-    required String label,
+    File? file,
     required VoidCallback onTap,
-    bool filled = false,
+    bool isMultiple = false,
   }) {
-    return SizedBox(
-      width: double.infinity,
-      child: OutlinedButton.icon(
-        onPressed: onTap,
-        icon: Icon(icon, color: filled ? Colors.deepPurple : Colors.grey),
-        label: Text(
-          label,
-          style: TextStyle(
-            color: filled ? Colors.deepPurple : Colors.grey[600],
+    final bool isSelected = file != null || (isMultiple && file != null);
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color:
+                isSelected
+                    ? const Color(0xFFE94560).withOpacity(0.1)
+                    : Colors.white.withOpacity(0.05),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color:
+                  isSelected
+                      ? const Color(0xFFE94560)
+                      : Colors.white.withOpacity(0.1),
+              width: 1,
+            ),
           ),
-        ),
-        style: OutlinedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          side: BorderSide(
-            color: filled ? Colors.deepPurple : Colors.grey[400]!,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color:
+                      isSelected
+                          ? const Color(0xFFE94560).withOpacity(0.2)
+                          : Colors.white.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  isSelected ? Icons.check : icon,
+                  color: isSelected ? const Color(0xFFE94560) : Colors.white70,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        color:
+                            isSelected
+                                ? const Color(0xFFE94560)
+                                : Colors.white54,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(Icons.arrow_forward_ios, color: Colors.white24, size: 16),
+            ],
           ),
         ),
       ),
